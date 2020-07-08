@@ -1,6 +1,11 @@
 .vscode
 __pycache__
-/home/irma/Documents/dsi_internship/American Currency collection_counterfeit reporters.xlsx
-/home/irma/Documents/dsi_internship/American Currency collection_money-JSTOR.csv
-/home/irma/Documents/dsi_internship/American Currency collection_money-JSTOR.xlsx
-/home/irma/Documents/dsi_internship/.~lock.American Currency collection_money-JSTOR.xlsx#
+currency_cache.json
+American Currency collection_counterfeit reporters.xlsx
+American Currency collection_money-JSTOR.csv
+American Currency collection_money-JSTOR.xlsx
+.~*
+currency_cache_cleaned.json
+currency_cache.json
+local-filename.jpg
+test2_filenamedeliverytag.jpg

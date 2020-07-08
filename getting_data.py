@@ -1,7 +1,9 @@
-#WikiMedia project: Clean, save and map digital object URN
+#WikiMedia project: Uses a URN to obtain JSON files of each objects. 
+#The JSON files are being stored as cache. 
 import csv
 import requests
 from irmacache import Cache
+
 
 cache= Cache(filename='currency_cache.json')
 
@@ -24,15 +26,13 @@ def clean_urn(dirty_urn):
     return dirty_urn[4:] 
 
 
-#Search in API using the URN and returning a json file. The response will be saved on a cache file. 
+#Search in API using the URN and returning a dictionary. The response will be saved on a cache file. 
 def search_library_cloud(urn: str):
     base_url= "https://api.lib.harvard.edu/v2/items.json"
     params = {'urn': urn}
     # response = requests.get(base_url,params).json()
-    response= cache.get_json(base_url,params)
+    response= cache.gw_json(base_url,params)
     return response
-
-
 
   
 #Display of the data
@@ -40,17 +40,24 @@ def test():
     dict_list= data_csv()
     # print(len(dict_list))
     # input("enter any value:")
-    for row_dict in dict_list: 
+    base_save_dir = "/home/irma/Documents/dsi_currency_imgs/"
+    for row_dict in dict_list[:10]: 
         # print(row_dict['Filename'])
         urn= clean_urn(row_dict['Filename'])
-        print(search_library_cloud(urn))
-
-
-
-
-        
+        metadata = search_library_cloud(urn)
+        # print(metadata)
+        try:
+            url= metadata['items']['mods']['extensiourl.split("/")[-1].split(":")n'][2]["DRSMetadata"]["fileDeliveryURL"]
+            print(url)
+        except:
+            print("url not found")
+        # path_elements= url.split("/")[-1].split(":")
+        # save_dir=base_save_dir + "/" + path_elements[0] + "/" + path_elements[1]
+        # print(url.split("/")[-1].split(":"))
 
 test()
 
+# data=data_csv()
+# print(data)
 
 
