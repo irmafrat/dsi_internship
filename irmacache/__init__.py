@@ -74,7 +74,7 @@ class Cache:
   
   
     def gw_json(self, url:str, params:dict, wait_time=180, number_tries=20):
-        response = self.get_and_wait(url, params)
+        response = self.get_and_wait(url, params, wait_time, number_tries)
         try:
             return json.loads(response)
         except:

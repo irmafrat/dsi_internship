@@ -31,7 +31,7 @@ def search_library_cloud(urn: str):
     base_url= "https://api.lib.harvard.edu/v2/items.json"
     params = {'urn': urn}
     # response = requests.get(base_url,params).json()
-    response= cache.gw_json(base_url,params)
+    response= cache.gw_json(base_url,params,wait_time=15,number_tries=2)
     return response
 
   
@@ -41,23 +41,30 @@ def test():
     # print(len(dict_list))
     # input("enter any value:")
     base_save_dir = "/home/irma/Documents/dsi_currency_imgs/"
-    for row_dict in dict_list[:10]: 
+    total=0
+    count_no_url = 0
+    for row_dict in dict_list[:]: 
         # print(row_dict['Filename'])
         urn= clean_urn(row_dict['Filename'])
         metadata = search_library_cloud(urn)
         # print(metadata)
+        total += 1
         try:
-            url= metadata['items']['mods']['extensiourl.split("/")[-1].split(":")n'][2]["DRSMetadata"]["fileDeliveryURL"]
+            url= metadata['items']['mods']['extension'][2]["DRSMetadata"]["fileDeliveryURL"]
             print(url)
         except:
+            count_no_url += 1
             print("url not found")
+            print(metadata['items']['mods'])
         # path_elements= url.split("/")[-1].split(":")
         # save_dir=base_save_dir + "/" + path_elements[0] + "/" + path_elements[1]
         # print(url.split("/")[-1].split(":"))
+    print(f"no url on {count_no_url} of {total}")
 
 test()
 
-# data=data_csv()
-# print(data)
+#Testing GitLab + GitHub!
+
+
 
 
