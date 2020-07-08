@@ -1,6 +1,5 @@
 # dsi_internship
 
-The purpose of this git is to share DSI 2020 intership projects. 
 Currently working on a Wikimedia/Wikidata project using Harvard Digital Collections. 
 
 Part I- On developement
