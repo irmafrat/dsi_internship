@@ -4,6 +4,7 @@ import csv
 import requests
 import os.path
 import hashlib
+from time import sleep
 from irmacache import Cache
 
 
@@ -54,8 +55,17 @@ def finding_url(urn:str):
     return url
 
 #Download and get deep url. Returns a tuple with two elements.
-def image_deep_url(url:str):
+def image_deep_url(url:str, max_retry=60):
     response= requests.get(url)
+    total_tries= 0
+    while not response.ok:
+        total_tries +=1
+        print(f"Retry #{total_tries}")
+        sleep(30)
+        response= requests.get(url)
+        if total_tries > max_retry:
+            break
+
     if response.ok:
         image_binary = response.content
         # if response.status_code == 200:
@@ -107,7 +117,9 @@ def main():
         handler.write(f"urn,url,deep_url,image_filename,md5sum\n")
     
     # Download Images
-    for row_dict in dict_list[:]: 
+    skip = 290
+    total += skip
+    for row_dict in dict_list[skip:]: 
         total += 1
         print(total)
         urn= clean_urn(row_dict['Filename'])
