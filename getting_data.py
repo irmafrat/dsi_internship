@@ -55,7 +55,7 @@ def finding_url(urn:str):
     return url
 
 #Download and get deep url. Returns a tuple with two elements.
-def image_deep_url(url:str, max_retry=60):
+def image_deep_url(url:str, image_filename: str, max_retry=60):
     response= requests.get(url)
     total_tries= 0
     while not response.ok:
@@ -77,25 +77,22 @@ def image_deep_url(url:str, max_retry=60):
     return None, None
 
 
-# >>> 
-# >>> 
-# '2a53375ff139d9837e93a38a279d63e5'
-
 
 #Saves Image 
 def save_image(
-            image_binary: bin, urn: str, url: str, deep_url: str,
-            csv_file="image_data.csv", image_save_dir = "/home/irma/Documents/dsi_currency_imgs/"
+            image_binary: bin, urn: str, url: str, deep_url: str, image_filename:str,
+            csv_file="image_data.csv"
         ):
-    image_filename = urn.replace(":", "_") + ".jpeg"
-    image_absolute_filename = image_save_dir + image_filename
-    with open(image_absolute_filename, "wb") as handler:
+        # Downloads the image as binary
+    with open(image_filename, "wb") as handler:
         handler.write(image_binary)
     
-    md5sum = hashlib.md5(image_binary).hexdigest()
+    # md5sum = hashlib.md5(image_binary).hexdigest()
+    sha1 = hashlib.sha1(image_binary).hexdigest()
     
+    # Creates a CSV that saves the URN,URL,Deep link,image filemane and checksum
     with open(csv_file,"a") as handler:
-        row = f"{urn},{url},{deep_url},{image_filename},{md5sum}\n"
+        row = f"{urn},{url},{deep_url},{image_filename.split('/')[-1]},{sha1}\n"
         print(row)
         handler.write(row)
 
@@ -110,23 +107,27 @@ def main():
 
     total=0
     count_no_url = 0
-    image_filename_metadata = "image_filename.csv"
 
-    # Initialize metadata file
-    with open(image_filename_metadata,"w") as handler:
-        handler.write(f"urn,url,deep_url,image_filename,md5sum\n")
+    
     
     # Download Images
-    skip = 290
+    skip = 0
+    image_filename_metadata = "image_filename"+ str(skip).zfill(4) + ".csv"
+    # Initialize metadata file
+    with open(image_filename_metadata,"w") as handler:
+        handler.write(f"urn,url,deep_url,image_filename,sha1\n")
     total += skip
     for row_dict in dict_list[skip:]: 
         total += 1
         print(total)
         urn= clean_urn(row_dict['Filename'])
+        image_title = "" # TO DO
+        image_filename = image_title + "_" + urn.replace(":", "_") + ".jpeg"
+        image_absolute_filename = base_save_dir + image_filename
         url=finding_url(urn)
         if url is not None:
-            image_binary, deep_url = image_deep_url(url)
-            save_image(image_binary, urn, url=url, deep_url=deep_url, csv_file=image_filename_metadata, image_save_dir=base_save_dir)
+            image_binary, deep_url = image_deep_url(url, image_absolute_filename)
+            save_image(image_binary, urn, url=url, deep_url=deep_url, csv_file=image_filename_metadata, image_filename=image_absolute_filename)
         else:
             count_no_url += 1
     print(f"no url on {count_no_url} of {total}")

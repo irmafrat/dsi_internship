@@ -10,3 +10,5 @@ currency_cache.json
 local-filename.jpg
 test2_filenamedeliverytag.jpg
 currency_cache.json
+*.json
+image_filename.csv
