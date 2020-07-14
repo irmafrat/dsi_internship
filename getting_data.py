@@ -37,8 +37,11 @@ def search_library_cloud(urn: str):
     response= cache.gw_json(base_url,params,wait_time=15,number_tries=2)
     return response
 
+
+ 
 #Test if there is a url on two diferent locations of the urn dictionary. Returns the URL.
-def finding_url(urn:str): 
+def finding_url(urn:str):
+    # TO DO RETURN CLASS INSTEAD OF URL. CREATE A CLASS TO GET TITLE, YEAR, AND METADATA REQUIRED BY THE WIKIMEDIA TEMPLATE. 
     metadata = search_library_cloud(urn)
     # print(metadata)
     try:
@@ -56,6 +59,8 @@ def finding_url(urn:str):
 
 #Download and get deep url. Returns a tuple with two elements.
 def image_deep_url(url:str, image_filename: str, max_retry=60):
+    # TO DO EXTRACT BINARY FROM FILE AND DEEP URL USING HEAD INSTEAD OF GET 
+    # (IF FILE EXISTS NEW METHOD ELSE DO OLD VERSION)
     response= requests.get(url)
     total_tries= 0
     while not response.ok:
@@ -83,45 +88,43 @@ def save_image(
             image_binary: bin, urn: str, url: str, deep_url: str, image_filename:str,
             csv_file="image_data.csv"
         ):
-        # Downloads the image as binary
     with open(image_filename, "wb") as handler:
         handler.write(image_binary)
     
-    # md5sum = hashlib.md5(image_binary).hexdigest()
     sha1 = hashlib.sha1(image_binary).hexdigest()
     
-    # Creates a CSV that saves the URN,URL,Deep link,image filemane and checksum
-    with open(csv_file,"a") as handler:
+    with open(csv_file,"a") as handler: # updates (appends to the end of file)
         row = f"{urn},{url},{deep_url},{image_filename.split('/')[-1]},{sha1}\n"
         print(row)
         handler.write(row)
 
 def main():
-    dict_list= data_csv()
-    # print(len(dict_list))
-    # input("enter any value:")
-    base_save_dir = "/home/irma/Documents/dsi_currency_imgs/"
 
+    base_save_dir = "/home/irma/Documents/dsi_currency_imgs/"
     if not os.path.isdir(base_save_dir):
         os.makedirs(base_save_dir)
 
+    image_filename_metadata = "image_filename.csv"
+
+    # Initialize metadata file
+    with open(image_filename_metadata,"w") as handler:
+        handler.write(f"urn,url,deep_url,image_filename,sha1\
+            \n")
+    
+    dict_list= data_csv()
+
     total=0
     count_no_url = 0
-
     
     
     # Download Images
-    skip = 0
-    image_filename_metadata = "image_filename"+ str(skip).zfill(4) + ".csv"
-    # Initialize metadata file
-    with open(image_filename_metadata,"w") as handler:
-        handler.write(f"urn,url,deep_url,image_filename,sha1\n")
+    skip = 971
     total += skip
     for row_dict in dict_list[skip:]: 
         total += 1
         print(total)
         urn= clean_urn(row_dict['Filename'])
-        image_title = "" # TO DO
+        image_title = "" # To do
         image_filename = image_title + "_" + urn.replace(":", "_") + ".jpeg"
         image_absolute_filename = base_save_dir + image_filename
         url=finding_url(urn)
