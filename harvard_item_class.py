@@ -94,9 +94,46 @@ class CurrencyItem(HarvardItem):
         self.inscriptions = get_inscriptions()
         self.notes = get_notes()
         self.accession_num = get_accession_num()
-        self.permission = get_permission # rights statement txt on progress/waiting OGC
+        self.permission = permission # rights statement txt on progress/waiting OGC
         self.other_versions = get_other_versions() #Hollis URL (Verso and Recto images on the same record)
     
+
+    def get_author(self):
+        for dictionary in self.csv_dict.keys:
+            return [Creator[33420]]
+
+
+
+    def get_description(self):
+        pass
+
+    def get_dimensions(self):
+        pass
+
+    def get_medium(self):
+        pass
+
+    def get_institution(self):
+        pass
+
+    def get_date(self):
+        pass
+
+    def get_inscriptions(self):
+        pass
+
+    def get_notes(self):
+        pass
+
+    def get_accession_num(self):
+        pass
+
+    def permission(self):
+        pass
+
+    def get_other_versions(self):
+        pass
+
 
     def get_title(self):
         title = super().get_title()
