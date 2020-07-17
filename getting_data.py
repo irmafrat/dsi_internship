@@ -6,6 +6,8 @@ import os.path
 import hashlib
 from time import sleep
 from irmacache import Cache
+import harvard_item_class as hic 
+
 
 
 cache= Cache(filename='currency_cache.json')
@@ -104,12 +106,15 @@ def main():
     if not os.path.isdir(base_save_dir):
         os.makedirs(base_save_dir)
 
-    image_filename_metadata = "image_filename.csv"
+    image_filename_metadata = "wikimedia_bash_upload.csv"
 
     # Initialize metadata file
-    with open(image_filename_metadata,"w") as handler:
-        handler.write(f"urn,url,deep_url,image_filename,sha1\
-            \n")
+    metadata_column_list=["title","source","permission","author","description","date","medium","dimensions","institution",
+        "department","notes","accession number"]
+    handler = open(image_filename_metadata,"w")
+    for metadata in metadata_column_list[:-1]:
+        handler.write(metadata + ",")
+    handler.write(metadata_column_list[-1] + "\n")
     
     dict_list= data_csv()
 
@@ -118,22 +123,34 @@ def main():
     
     
     # Download Images
-    skip = 971
+    skip = 0
     total += skip
-    for row_dict in dict_list[skip:]: 
+    for csv_dict in dict_list[skip:]: 
         total += 1
         print(total)
-        urn= clean_urn(row_dict['Filename'])
-        image_title = "" # To do
-        image_filename = image_title + "_" + urn.replace(":", "_") + ".jpeg"
-        image_absolute_filename = base_save_dir + image_filename
-        url=finding_url(urn)
-        if url is not None:
-            image_binary, deep_url = image_deep_url(url, image_absolute_filename)
-            save_image(image_binary, urn, url=url, deep_url=deep_url, csv_file=image_filename_metadata, image_filename=image_absolute_filename)
-        else:
-            count_no_url += 1
-    print(f"no url on {count_no_url} of {total}")
+        urn= clean_urn(csv_dict['Filename'])
+        api_dict = search_library_cloud(urn)
+        item = hic.CurrencyItem(api_dict,csv_dict)
+        item.permission="Rights Statements in evaluation, waiting for OGC. No permission granted."
+        print(item.filename())
+        csv_row = item.wikimedia_csv()
+        print(csv_row)
+        handler.write(csv_row + "\n")
+    handler.close()
+
+
+
+
+    #     image_title = "" # To do
+    #     image_filename = image_title + "_" + urn.replace(":", "_") + ".jpeg"
+    #     image_absolute_filename = base_save_dir + image_filename
+    #     url=finding_url(urn)
+    #     if url is not None:
+    #         image_binary, deep_url = image_deep_url(url, image_absolute_filename)
+    #         save_image(image_binary, urn, url=url, deep_url=deep_url, csv_file=image_filename_metadata, image_filename=image_absolute_filename)
+    #     else:
+    #         count_no_url += 1
+    # print(f"no url on {count_no_url} of {total}")
 
 
 if __name__ == "__main__":
